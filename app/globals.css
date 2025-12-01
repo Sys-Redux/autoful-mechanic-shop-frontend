@@ -1,26 +1,518 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================
+   AUTOFUL MECHANIC SHOP - DESIGN SYSTEM
+
+   Color Philosophy:
+   - Primary: Deep blue (#1e3a5f) - Trust, professionalism
+   - Secondary: Steel gray (#4a5568) - Industrial, machinery
+   - Accent: Safety orange (#f97316) - CTAs, warnings, highlights
+   - Success: Green (#22c55e) - Completed jobs, in-stock
+   - Warning: Amber (#f59e0b) - Low stock, pending
+   - Danger: Red (#ef4444) - Errors, out of stock
+   ============================================ */
+
+@theme {
+  /* Brand Colors */
+  --color-brand-50: #e6f0fa;
+  --color-brand-100: #cce1f5;
+  --color-brand-200: #99c3eb;
+  --color-brand-300: #66a5e0;
+  --color-brand-400: #3387d6;
+  --color-brand-500: #1e5a9e;
+  --color-brand-600: #1e3a5f;
+  --color-brand-700: #162c48;
+  --color-brand-800: #0f1e30;
+  --color-brand-900: #070f18;
+
+  /* Steel/Industrial Grays */
+  --color-steel-50: #f8fafc;
+  --color-steel-100: #f1f5f9;
+  --color-steel-200: #e2e8f0;
+  --color-steel-300: #cbd5e1;
+  --color-steel-400: #94a3b8;
+  --color-steel-500: #64748b;
+  --color-steel-600: #475569;
+  --color-steel-700: #334155;
+  --color-steel-800: #1e293b;
+  --color-steel-900: #0f172a;
+
+  /* Accent Orange (Safety/CTA) */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+  --color-accent-900: #7c2d12;
+
+  /* Semantic Colors */
+  --color-success: #22c55e;
+  --color-success-light: #dcfce7;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-danger: #ef4444;
+  --color-danger-light: #fee2e2;
+
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Spacing Scale */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  --spacing-sidebar: 16rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================
+   BASE LAYER - Global element styles
+   ============================================ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply border-steel-200;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-steel-50 text-steel-900 font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-steel-900;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+
+  h4 {
+    @apply text-lg md:text-xl;
+  }
+
+  /* Links */
+  a {
+    @apply text-brand-600 hover:text-brand-700 transition-colors;
+  }
+
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-steel-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-steel-400 rounded-full hover:bg-steel-500;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================
+   COMPONENTS LAYER - Reusable component classes
+   ============================================ */
+@layer components {
+  /* ===== BUTTONS ===== */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2 rounded-lg font-medium text-sm
+           transition-all duration-200 ease-in-out
+           focus-visible:outline-2 focus-visible:outline-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-600 text-white
+           hover:bg-brand-700 active:bg-brand-800
+           focus-visible:outline-brand-500
+           shadow-sm hover:shadow-md;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent-500 text-white
+           hover:bg-accent-600 active:bg-accent-700
+           focus-visible:outline-accent-500
+           shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply btn bg-steel-100 text-steel-700
+           hover:bg-steel-200 active:bg-steel-300
+           focus-visible:outline-steel-500
+           border border-steel-300;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-steel-600
+           hover:bg-steel-100 active:bg-steel-200
+           focus-visible:outline-steel-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-white
+           hover:bg-red-600 active:bg-red-700
+           focus-visible:outline-danger;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .btn-icon {
+    @apply p-2 aspect-square;
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    @apply bg-white rounded-xl border border-steel-200
+           shadow-card overflow-hidden;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-steel-200 bg-steel-50;
+  }
+
+  .card-body {
+    @apply px-6 py-4;
+  }
+
+  .card-footer {
+    @apply px-6 py-4 border-t border-steel-200 bg-steel-50;
+  }
+
+  .card-hoverable {
+    @apply card transition-all duration-200
+           hover:shadow-elevated hover:border-steel-300
+           cursor-pointer;
+  }
+
+  /* ===== FORM INPUTS ===== */
+  .input {
+    @apply block w-full px-3 py-2
+           bg-white border border-steel-300 rounded-lg
+           text-steel-900 placeholder:text-steel-400
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500
+           disabled:bg-steel-100 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+
+  .input-error {
+    @apply input border-danger focus:ring-danger focus:border-danger;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-steel-700 mb-1;
+  }
+
+  .input-hint {
+    @apply mt-1 text-sm text-steel-500;
+  }
+
+  .input-error-message {
+    @apply mt-1 text-sm text-danger;
+  }
+
+  /* ===== SELECT ===== */
+  .select {
+    @apply input appearance-none bg-no-repeat bg-right pr-10
+           bg-[url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")]
+           bg-[length:1.5rem_1.5rem];
+  }
+
+  /* ===== BADGES ===== */
+  .badge {
+    @apply inline-flex items-center gap-1
+           px-2.5 py-0.5 rounded-full
+           text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-brand-100 text-brand-700;
+  }
+
+  .badge-success {
+    @apply badge bg-success-light text-green-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning-light text-amber-700;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger-light text-red-700;
+  }
+
+  .badge-steel {
+    @apply badge bg-steel-100 text-steel-700;
+  }
+
+  /* ===== TABLES ===== */
+  .table-container {
+    @apply overflow-x-auto rounded-lg border border-steel-200;
+  }
+
+  .table {
+    @apply w-full text-sm text-left;
+  }
+
+  .table thead {
+    @apply bg-steel-100 text-steel-700 uppercase text-xs tracking-wider;
+  }
+
+  .table th {
+    @apply px-4 py-3 font-semibold;
+  }
+
+  .table td {
+    @apply px-4 py-3 border-t border-steel-200;
+  }
+
+  .table tbody tr {
+    @apply bg-white hover:bg-steel-50 transition-colors;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    @apply fixed left-0 top-0 h-screen w-64
+           bg-brand-800 text-white
+           flex flex-col z-40;
+  }
+
+  .sidebar-header {
+    @apply px-6 py-5 border-b border-brand-700;
+  }
+
+  .sidebar-nav {
+    @apply flex-1 overflow-y-auto py-4;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-6 py-3
+           text-brand-100 hover:bg-brand-700 hover:text-white
+           transition-colors duration-200;
+  }
+
+  .sidebar-link-active {
+    @apply sidebar-link bg-brand-700 text-white
+           border-r-4 border-accent-500;
+  }
+
+  .sidebar-section-title {
+    @apply px-6 py-2 text-xs font-semibold uppercase
+           tracking-wider text-brand-400;
+  }
+
+  /* ===== STATS CARD ===== */
+  .stat-card {
+    @apply card p-6;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-steel-900;
+  }
+
+  .stat-label {
+    @apply text-sm text-steel-500 mt-1;
+  }
+
+  .stat-icon {
+    @apply p-3 rounded-lg;
+  }
+
+  /* ===== LOADING STATES ===== */
+  .skeleton {
+    @apply animate-pulse bg-steel-200 rounded;
+  }
+
+  .spinner {
+    @apply animate-spin rounded-full
+           border-2 border-steel-200
+           border-t-brand-600;
+  }
+
+  /* ===== ALERTS ===== */
+  .alert {
+    @apply p-4 rounded-lg flex items-start gap-3;
+  }
+
+  .alert-success {
+    @apply alert bg-success-light text-green-800;
+  }
+
+  .alert-warning {
+    @apply alert bg-warning-light text-amber-800;
+  }
+
+  .alert-danger {
+    @apply alert bg-danger-light text-red-800;
+  }
+
+  .alert-info {
+    @apply alert bg-brand-100 text-brand-800;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 z-50
+           flex items-center justify-center p-4;
+  }
+
+  .modal {
+    @apply bg-white rounded-xl shadow-modal
+           w-full max-w-md max-h-[90vh]
+           overflow-y-auto;
+  }
+
+  .modal-header {
+    @apply px-6 py-4 border-b border-steel-200
+           flex items-center justify-between;
+  }
+
+  .modal-body {
+    @apply px-6 py-4;
+  }
+
+  .modal-footer {
+    @apply px-6 py-4 border-t border-steel-200
+           flex items-center justify-end gap-3;
+  }
+}
+
+/* ============================================
+   UTILITIES LAYER - Custom utility classes
+   ============================================ */
+@layer utilities {
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Layout utilities */
+  .main-content {
+    @apply ml-64 min-h-screen;
+  }
+
+  .page-container {
+    @apply p-6 md:p-8 max-w-7xl mx-auto;
+  }
+
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl md:text-3xl font-bold text-steel-900;
+  }
+
+  .page-subtitle {
+    @apply text-steel-500 mt-1;
+  }
+
+  /* Grid layouts */
+  .stats-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+
+  .form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* VIN display - monospace for readability */
+  .vin-display {
+    @apply font-mono text-sm tracking-wide;
+  }
+
+  /* Price display */
+  .price-display {
+    @apply font-semibold tabular-nums;
+  }
+
+  /* Status indicators */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .status-dot-success {
+    @apply status-dot bg-success;
+  }
+
+  .status-dot-warning {
+    @apply status-dot bg-warning;
+  }
+
+  .status-dot-danger {
+    @apply status-dot bg-danger;
+  }
 }
