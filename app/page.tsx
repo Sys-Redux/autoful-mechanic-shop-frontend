@@ -47,7 +47,7 @@ export default function LandingPage() {
     <div className='min-h-screen bg-steel-50'>
       <Navbar transparent={true} />
       {/* Hero Section */}
-      <section className='relative min-h-screen flex items-center bg-gradient-to-br from-brand-800
+      <section className='relative min-h-screen flex items-center bg-linear-to-br from-brand-800
         via-brand-700 to-brand-900 overflow-hidden'>
         {/* Background Pattern */}
         <div className='absolute inset-0 opacity-10'>
@@ -91,8 +91,8 @@ export default function LandingPage() {
             <div className='relative hidden lg:block'>
               <div className='relative w-full h-[500px]'>
                 {/* Main Image */}
-                <div className='absolute top-0 right-0 w-[380px] h-[280px] rounded-2xl overflow-hidden shadow-2xl
-                  transform rotate-2 hover:rotate-0 transition-transform duration-300'>
+                <div className='absolute top-0 right-0 w-95 h-70 rounded-2xl overflow-hidden shadow-2xl
+                  transform rotate-2 hover:-rotate-2 transition-transform duration-300'>
                   <Image
                     src='/assets/mechanic-shop.png'
                     alt='Mechanic Shop'
@@ -102,8 +102,8 @@ export default function LandingPage() {
                   />
                 </div>
                 {/* Secondary Image */}
-                <div className='absolute top-8 left-0 w-[240px] h-[180px] rounded-2xl overflow-hidden shadow-xl
-                  transform -rotate-3 hover:rotate-0 transition-transform duration-300'>
+                <div className='absolute top-8 left-0 w-60 h-45 rounded-2xl overflow-hidden shadow-xl
+                  transform -rotate-3 hover:rotate-3 transition-transform duration-300'>
                   <Image
                     src='/assets/story-reel.png'
                     alt='Service History'
@@ -112,8 +112,8 @@ export default function LandingPage() {
                   />
                 </div>
                 {/* Accent Image */}
-                <div className='absolute bottom-0 right-12 w-[280px] h-[200px] rounded-2xl overflow-hidden shadow-xl
-                  transform -rotate-1 hover:rotate-0 transition-transform duration-300'>
+                <div className='absolute bottom-0 right-12 w-70 h-50 rounded-2xl overflow-hidden shadow-xl
+                  transform -rotate-1 hover:rotate-7 transition-transform duration-300'>
                   <Image
                     src='/assets/happy-customer.png'
                     alt='Happy Customer'
@@ -265,7 +265,7 @@ export default function LandingPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className='py-24 bg-gradient-to-br from-brand-700 to-brand-900'>
+      <section className='py-24 bg-linear-to-br from-brand-700 to-brand-900'>
         <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
           <h2 className='text-3xl sm:text-4xl font-bold text-white mb-6'>
             Ready to Streamline Your Work?
