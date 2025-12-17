@@ -26,11 +26,15 @@ import {
 
 const partSchema = z.object({
     part_name: z.string().min(2, 'Part name must be at least 2 characters long'),
-    price: z.number().min(0, 'Price must be a positive number'),
-    quantity_in_stock: z.number().min(0, 'Quantity must be a positive number'),
+    price: z.coerce.number().min(0, 'Price must be a positive number'),
+    quantity_in_stock: z.coerce.number().min(0, 'Quantity must be a positive number'),
 });
 
-type PartFormData = z.infer<typeof partSchema>;
+type PartFormData = {
+    part_name: string;
+    price: number;
+    quantity_in_stock: number;
+};
 
 export default function InventoryPage() {
     const [search, setSearch] = useState('');
@@ -52,7 +56,8 @@ export default function InventoryPage() {
         reset,
         formState: { errors },
     } = useForm<PartFormData>({
-        resolver: zodResolver(partSchema),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(partSchema) as any,
     });
 
     const {
@@ -61,7 +66,8 @@ export default function InventoryPage() {
         reset: resetEdit,
         formState: { errors: editErrors },
     } = useForm<PartFormData>({
-        resolver: zodResolver(partSchema),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(partSchema) as any,
     });
 
     const handleCreate = async (data: PartFormData) => {

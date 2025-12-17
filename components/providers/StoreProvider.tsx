@@ -3,7 +3,8 @@
 import { useRef, useEffect, type ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { makeStore, type AppStore } from '@/lib/store/store';
-import { initializeAuthListener, setUser } from '@/lib/store/authSlice';
+import { initializeAuthListener, setUser, setInitialized } from '@/lib/store/authSlice';
+import { setAuthTokenGetter } from '@/lib/api';
 import type { AuthUser } from '@/types/auth';
 
 const USER_STORAGE_KEY = 'autoful_user';
@@ -38,11 +39,11 @@ function getStore() {
     if (!store) {
         store = makeStore();
 
-        // Restore user from localStorage on initial creation
-        const storedUser = getStoredUser();
-        if (storedUser) {
-            store.dispatch(setUser(storedUser));
-        }
+        // Set up auth token getter for API calls
+        setAuthTokenGetter(() => {
+            const state = store?.getState();
+            return state?.auth.user?.authToken ?? null;
+        });
     }
     return store;
 }
@@ -51,8 +52,22 @@ export default function StoreProvider({ children }: { children: ReactNode }) {
     // Get or create the store (singleton pattern)
     const storeInstance = getStore();
 
-    // Track if we've set up listeners
+    // Track if we've set up listeners and hydrated
     const initialized = useRef(false);
+    const hydrated = useRef(false);
+
+    // Hydrate from localStorage AFTER first render to avoid SSR mismatch
+    useEffect(() => {
+        if (!hydrated.current) {
+            hydrated.current = true;
+            const storedUser = getStoredUser();
+            if (storedUser) {
+                storeInstance.dispatch(setUser(storedUser));
+            } else {
+                storeInstance.dispatch(setInitialized());
+            }
+        }
+    }, [storeInstance]);
 
     useEffect(() => {
         if (initialized.current) return;

@@ -12,7 +12,7 @@ import {
     registerCustomerSchema,
     registerMechanicSchema,
     type RegisterCustomerFormData,
-    type RegisterMechanicFormData,
+    type RegisterMechanicFormDefaults,
 } from '@/lib/validations/auth';
 
 type Role = 'customer' | 'mechanic';
@@ -53,7 +53,7 @@ function CustomerRegistrationForm({
                 password: data.password,
             })).unwrap();
             toast.success('Registration successful! Welcome aboard.');
-            router.push('/dashboard');
+            router.push('/customer-dashboard');
         } catch {
             toast.error(authError || 'Registration failed. Please try again.');
         }
@@ -195,8 +195,9 @@ function MechanicRegistrationForm({
     const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const { register, handleSubmit, formState: { errors } } = useForm<RegisterMechanicFormData>({
-        resolver: zodResolver(registerMechanicSchema),
+    const { register, handleSubmit, formState: { errors } } = useForm<RegisterMechanicFormDefaults>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolver: zodResolver(registerMechanicSchema) as any,
         defaultValues: {
             name: '',
             email: '',
@@ -207,7 +208,7 @@ function MechanicRegistrationForm({
         },
     });
 
-    const onSubmit = async (data: RegisterMechanicFormData) => {
+    const onSubmit = async (data: RegisterMechanicFormDefaults) => {
         dispatch(clearError());
         try {
             await dispatch(registerMechanic({
@@ -218,7 +219,7 @@ function MechanicRegistrationForm({
                 password: data.password,
             })).unwrap();
             toast.success('Registration successful! Welcome aboard.');
-            router.push('/dashboard');
+            router.push('/mechanic-dashboard');
         } catch {
             toast.error(authError || 'Registration failed. Please try again.');
         }

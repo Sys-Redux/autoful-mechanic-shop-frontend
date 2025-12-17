@@ -41,7 +41,7 @@ export const registerMechanicSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: emailSchema,
     phone: phoneSchema,
-    salary: z.number().min(0, 'Salary must be a positive number'),
+    salary: z.coerce.number().min(0, 'Salary must be a positive number'),
     password: passwordSchema,
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -50,3 +50,13 @@ export const registerMechanicSchema = z.object({
 });
 
 export type RegisterMechanicFormData = z.infer<typeof registerMechanicSchema>;
+
+// Explicit type for form default values (handles coerce issue)
+export type RegisterMechanicFormDefaults = {
+    name: string;
+    email: string;
+    phone: string;
+    salary: number;
+    password: string;
+    confirmPassword: string;
+};

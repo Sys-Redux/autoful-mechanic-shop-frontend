@@ -107,7 +107,8 @@ export const updateProfile = createAsyncThunk<AuthUser, ProfileUpdateData>(
             return await authService.refreshUserData(
                 auth.currentUser,
                 currentUser.role,
-                currentUser.db_id
+                currentUser.db_id,
+                currentUser.authToken
             );
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Profile update failed';

@@ -6,6 +6,7 @@ export interface AuthUser {
     displayName: string | null;
     role: UserRole;
     db_id: number;
+    authToken: string; // Backend JWT token for API calls
 }
 
 export interface AuthState {

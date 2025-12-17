@@ -1,6 +1,11 @@
-import { auth } from './firebase';
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+// Token getter function - will be set by StoreProvider
+let getAuthToken: (() => string | null) | null = null;
+
+export const setAuthTokenGetter = (getter: () => string | null) => {
+    getAuthToken = getter;
+};
 
 interface FetchOptions extends RequestInit {
     requiresAuth?: boolean;
@@ -23,13 +28,12 @@ export async function apiClient<T>(
         ...fetchOptions.headers,
     }
 
-    if (requiresAuth || auth.currentUser) {
-        const token = await auth.currentUser?.getIdToken();
-        if (token) {
-            (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-        } else if (requiresAuth) {
-            throw new ApiError(401, 'Authentication required');
-        }
+    // Use backend auth_token from Redux state
+    const token = getAuthToken?.();
+    if (token) {
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    } else if (requiresAuth) {
+        throw new ApiError(401, 'Authentication required');
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
