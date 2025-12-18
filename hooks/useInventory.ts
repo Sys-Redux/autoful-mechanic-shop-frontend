@@ -19,7 +19,9 @@ export function useInventory(page?: number, perPage?: number) {
     const query = params.toString();
     return useQuery({
         queryKey: inventoryKeys.list(page, perPage),
-        queryFn: () => api.get<InventoryPart[]>(`/inventory?${query ? `${query}` : ''}`),
+        queryFn: () => api.get<InventoryPart[]>(`/inventory${query ? `?${query}` : ''}`),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: 1, // Only retry once to avoid hammering rate-limited endpoint
     });
 }
 

@@ -122,8 +122,8 @@ export default function LandingPage() {
                   />
                 </div>
                 {/* Decorative Elements */}
-                <div className='absolute -bottom-4 left-20 w-20 h-20 bg-accent-500 rounded-2xl opacity-80' />
-                <div className='absolute top-1/2 -left-8 w-16 h-16 bg-brand-400 rounded-full opacity-60' />
+                <div className='absolute -bottom-4 left-20 w-20 h-20 bg-accent-500 rounded-2xl opacity-80 animate-[float_6s_ease-in-out_infinite]' />
+                <div className='absolute top-1/2 -left-8 w-16 h-16 bg-brand-400 rounded-full opacity-60 animate-[float_4s_ease-in-out_infinite_reverse]' />
               </div>
             </div>
           </div>
@@ -259,6 +259,11 @@ export default function LandingPage() {
                   fill
                   className='object-cover'
                 />
+              </div>
+              {/* Stats Overlay */}
+              <div className='absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-6 hidden sm:block'>
+                <div className='text-3xl font-bold text-brand-600'>100%</div>
+                <div className='text-sm text-steel-600'>More Efficient</div>
               </div>
             </div>
           </div>
