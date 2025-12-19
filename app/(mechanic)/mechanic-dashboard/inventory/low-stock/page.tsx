@@ -89,7 +89,7 @@ export default function LowStockPage() {
                                     part.quantity_in_stock === 0 ? 'bg-red-600' : 'bg-amber-600'
                                 }`}>
                                     <AlertTriangle className={`w-6 h-6 ${
-                                        part.quantity_in_stock === 0 ? 'text-red-600' : 'text-amber-600'
+                                        part.quantity_in_stock === 0 ? 'text-amber-600' : 'text-red-600'
                                     }`} />
                                 </div>
                                 <div className='flex-1 min-w-0'>
