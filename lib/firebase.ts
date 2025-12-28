@@ -12,4 +12,10 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const auth = getAuth(app);
+
+// Secondary app for creating users without affecting current session
+const secondaryApp = getApps().find(a => a.name === 'secondary') ||
+    initializeApp(firebaseConfig, 'secondary');
+export const secondaryAuth = getAuth(secondaryApp);
+
 export default app;

@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { createCustomerAccount } from '@/lib/services/authService';
 import type { Customer, CustomerWithTickets, ServiceTicketBasic } from '@/types/index';
+import type { RegisterCustomerData } from '@/types/auth';
 import { useAppSelector } from '@/lib/store/hooks';
 import { selectUserDbId, selectIsCustomer } from '@/lib/store/authSlice';
 
@@ -72,5 +74,16 @@ export function useDeleteCustomer() {
     const dbId = useAppSelector(selectUserDbId);
     return useMutation({
         mutationFn: () => api.delete(`/customers/${dbId}`, true),
+    });
+}
+
+// Create customer account (for mechanics) - creates both Firebase and backend user
+export function useCreateCustomer() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: RegisterCustomerData) => createCustomerAccount(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
+        },
     });
 }

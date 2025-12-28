@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Plus, X, Package, Search } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, Package, Search, User } from "lucide-react";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +11,7 @@ import { useCreateServiceTicket, useAddInventoryToTicket } from '@/hooks/useServ
 import { useCustomers } from '@/hooks/useCustomers';
 import { useInventory } from '@/hooks/useInventory';
 import { formatCurrency } from '@/lib/utils';
-import { InventoryPart } from '@/types';
+import { InventoryPart, Customer } from '@/types';
 
 interface QueuedPart {
     inventoryId: number;
@@ -29,7 +29,7 @@ const ticketSchema = z.object({
     service_desc: z.string()
         .min(10, 'Description must be at least 10 characters')
         .max(500, 'Description must be at most 500 characters'),
-    customer_id: z.string().min(1, 'Customer id required'),
+    customer_id: z.string().min(1, 'Customer is required'),
 });
 
 type TicketFormData = z.infer<typeof ticketSchema>;
@@ -40,6 +40,13 @@ export default function NewTicketPage() {
     const { data: inventory } = useInventory();
     const createTicket = useCreateServiceTicket();
     const addInventory = useAddInventoryToTicket();
+
+    // Customer autocomplete state
+    const [customerSearch, setCustomerSearch] = useState('');
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+    const customerInputRef = useRef<HTMLInputElement>(null);
+    const customerDropdownRef = useRef<HTMLDivElement>(null);
 
     // Parts queue state
     const [queuedParts, setQueuedParts] = useState<QueuedPart[]>([]);
@@ -53,14 +60,22 @@ export default function NewTicketPage() {
 
     const availableParts = inventory?.filter(p => p.quantity_in_stock > 0) ?? [];
 
+    // Filter customers based on search
+    const filteredCustomers = (customers ?? []).filter(customer =>
+        customer.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+        customer.email.toLowerCase().includes(customerSearch.toLowerCase()) ||
+        customer.phone.includes(customerSearch)
+    );
+
     // Filter parts based on search
     const filteredParts = availableParts.filter(part =>
         part.part_name.toLowerCase().includes(partSearch.toLowerCase())
     );
 
-    // Close dropdown when clicking outside
+    // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
+            // Parts dropdown
             if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(event.target as Node) &&
@@ -68,6 +83,15 @@ export default function NewTicketPage() {
                 !partInputRef.current.contains(event.target as Node)
             ) {
                 setShowPartDropdown(false);
+            }
+            // Customer dropdown
+            if (
+                customerDropdownRef.current &&
+                !customerDropdownRef.current.contains(event.target as Node) &&
+                customerInputRef.current &&
+                !customerInputRef.current.contains(event.target as Node)
+            ) {
+                setShowCustomerDropdown(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -77,6 +101,7 @@ export default function NewTicketPage() {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = useForm<TicketFormData>({
         resolver: zodResolver(ticketSchema),
@@ -84,6 +109,13 @@ export default function NewTicketPage() {
             service_date: new Date().toISOString().split('T')[0],
         },
     });
+
+    const handleSelectCustomer = (customer: Customer) => {
+        setSelectedCustomer(customer);
+        setCustomerSearch(customer.name);
+        setValue('customer_id', String(customer.id), { shouldValidate: true });
+        setShowCustomerDropdown(false);
+    };
 
     const handleAddPartToQueue = () => {
         if (!selectedPart || partQuantity < 1) return;
@@ -176,21 +208,56 @@ export default function NewTicketPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className='bg-white rounded-xl border border-steel-200 p-6 space-y-6'>
-                {/* Customer Select */}
+                {/* Customer Autocomplete */}
                 <div>
                     <label className='label'>Customer *</label>
-                    <select
-                        {...register('customer_id')}
-                        className={errors.customer_id ? 'select input-error' : 'select'}
-                        disabled={customersLoading}
-                    >
-                        <option value=''>Select a customer...</option>
-                        {customers?.map((customer) => (
-                            <option key={customer.id} value={customer.id}>
-                                {customer.name} ({customer.email})
-                            </option>
-                        ))}
-                    </select>
+                    <input type='hidden' {...register('customer_id')} />
+                    <div className='relative'>
+                        <User className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-steel-400' />
+                        <input
+                            ref={customerInputRef}
+                            type='text'
+                            value={customerSearch}
+                            onChange={(e) => {
+                                setCustomerSearch(e.target.value);
+                                setSelectedCustomer(null);
+                                setValue('customer_id', '', { shouldValidate: false });
+                                setShowCustomerDropdown(true);
+                            }}
+                            onFocus={() => setShowCustomerDropdown(true)}
+                            placeholder={customersLoading ? 'Loading customers...' : 'Search for a customer...'}
+                            disabled={customersLoading}
+                            className={`input pl-9 w-full ${errors.customer_id ? 'input-error' : ''}`}
+                        />
+                        {showCustomerDropdown && !customersLoading && (
+                            <div
+                                ref={customerDropdownRef}
+                                className='absolute z-10 w-full mt-1 bg-white border border-steel-200 rounded-lg shadow-lg max-h-60 overflow-y-auto'
+                            >
+                                {filteredCustomers.length > 0 ? (
+                                    filteredCustomers.map((customer) => (
+                                        <button
+                                            key={customer.id}
+                                            type='button'
+                                            onClick={() => handleSelectCustomer(customer)}
+                                            className={`w-full px-4 py-2 text-left hover:bg-steel-50 transition-colors ${
+                                                selectedCustomer?.id === customer.id ? 'bg-brand-50 text-brand-700' : ''
+                                            }`}
+                                        >
+                                            <div className='font-medium'>{customer.name}</div>
+                                            <div className='text-sm text-steel-500'>
+                                                {customer.email} • {customer.phone}
+                                            </div>
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className='px-4 py-3 text-steel-500 text-sm'>
+                                        {customerSearch ? 'No customers found' : 'Start typing to search...'}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                     {errors.customer_id && (
                         <p className='input-error-message'>{errors.customer_id.message}</p>
                     )}

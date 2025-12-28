@@ -31,7 +31,7 @@ export default function MechanicsPage() {
                 <div className='bg-linear-to-r from-brand-600 to-brand-700 rounded-xl p-6 text-white'>
                     <div className='flex items-center gap-2 mb-4'>
                         <Trophy className='w-5 h-5 text-amber-300' />
-                        <h2 className='font-semibold'>Top Performers</h2>
+                        <h2 className='font-semibold text-white'>Top Performers</h2>
                     </div>
                     <div className='grid sm:grid-cols-3 gap-4'>
                         {topMechanics.map((mechanic, index) => (

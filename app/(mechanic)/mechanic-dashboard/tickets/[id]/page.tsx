@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -12,6 +12,7 @@ import {
     X,
     Calendar,
     Car,
+    Search,
 } from "lucide-react";
 import { toast } from 'sonner';
 import {
@@ -25,6 +26,7 @@ import {
 import { useMechanics } from '@/hooks/useMechanics';
 import { useInventory } from '@/hooks/useInventory';
 import { formatDate, formatCurrency } from '@/lib/utils';
+import { Mechanic } from '@/types';
 
 export default function TicketDetailPage() {
     const params = useParams();
@@ -43,15 +45,43 @@ export default function TicketDetailPage() {
 
     const [showAddMechanic, setShowAddMechanic] = useState(false);
     const [showAddPart, setShowAddPart] = useState(false);
-    const [selectedMechanicId, setSelectedMechanicId] = useState('');
     const [selectedPartId, setSelectedPartId] = useState('');
     const [partQuantity, setPartQuantity] = useState(1);
+
+    // Mechanic autocomplete state
+    const [mechanicSearch, setMechanicSearch] = useState('');
+    const [selectedMechanic, setSelectedMechanic] = useState<Mechanic | null>(null);
+    const [showMechanicDropdown, setShowMechanicDropdown] = useState(false);
+    const mechanicInputRef = useRef<HTMLInputElement>(null);
+    const mechanicDropdownRef = useRef<HTMLDivElement>(null);
 
     const availableMechanics = allMechanics?.filter(
         m => !ticket?.mechanics.some(tm => tm.id === m.id)
     ) ?? [];
 
+    // Filter mechanics based on search
+    const filteredMechanics = availableMechanics.filter(mechanic =>
+        mechanic.name.toLowerCase().includes(mechanicSearch.toLowerCase()) ||
+        mechanic.email.toLowerCase().includes(mechanicSearch.toLowerCase())
+    );
+
     const availableParts = allParts?.filter(p => p.quantity_in_stock > 0) ?? [];
+
+    // Close mechanic dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                mechanicDropdownRef.current &&
+                !mechanicDropdownRef.current.contains(event.target as Node) &&
+                mechanicInputRef.current &&
+                !mechanicInputRef.current.contains(event.target as Node)
+            ) {
+                setShowMechanicDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) return;
@@ -64,16 +94,23 @@ export default function TicketDetailPage() {
         }
     };
 
+    const handleSelectMechanic = (mechanic: Mechanic) => {
+        setSelectedMechanic(mechanic);
+        setMechanicSearch(mechanic.name);
+        setShowMechanicDropdown(false);
+    };
+
     const handleAssignMechanic = async () => {
-        if (!selectedMechanicId) return;
+        if (!selectedMechanic) return;
         try {
             await assignMechanic.mutateAsync({
                 ticketId,
-                mechanicId: parseInt(selectedMechanicId),
+                mechanicId: selectedMechanic.id,
             });
             toast.success('Mechanic assigned successfully');
             setShowAddMechanic(false);
-            setSelectedMechanicId('');
+            setSelectedMechanic(null);
+            setMechanicSearch('');
         } catch {
             toast.error('Failed to assign mechanic');
         }
@@ -211,20 +248,52 @@ export default function TicketDetailPage() {
                     {showAddMechanic && (
                         <div className='mb-4 p-4 border border-steel-200 rounded-lg bg-steel-50'>
                             <div className='flex items-center gap-2'>
-                                <select
-                                    value={selectedMechanicId}
-                                    onChange={(e) => setSelectedMechanicId(e.target.value)}
-                                    className='select flex-1'
-                                >
-                                    <option value=''>Select a mechanic...</option>
-                                    {availableMechanics.map((mechanic) => (
-                                        <option key={mechanic.id} value={mechanic.id}>{mechanic.name}</option>
-                                    ))}
-                                </select>
-                                <button onClick={handleAssignMechanic} className='btn-sm btn-primary'>
+                                <div className='relative flex-1'>
+                                    <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-steel-400' />
+                                    <input
+                                        ref={mechanicInputRef}
+                                        type='text'
+                                        value={mechanicSearch}
+                                        onChange={(e) => {
+                                            setMechanicSearch(e.target.value);
+                                            setSelectedMechanic(null);
+                                            setShowMechanicDropdown(true);
+                                        }}
+                                        onFocus={() => setShowMechanicDropdown(true)}
+                                        placeholder='Search for a mechanic...'
+                                        className='input pl-9 w-full'
+                                    />
+                                    {showMechanicDropdown && (
+                                        <div
+                                            ref={mechanicDropdownRef}
+                                            className='absolute z-10 w-full mt-1 bg-white border border-steel-200 rounded-lg shadow-lg max-h-60 overflow-y-auto'
+                                        >
+                                            {filteredMechanics.length > 0 ? (
+                                                filteredMechanics.map((mechanic) => (
+                                                    <button
+                                                        key={mechanic.id}
+                                                        type='button'
+                                                        onClick={() => handleSelectMechanic(mechanic)}
+                                                        className={`w-full px-4 py-2 text-left hover:bg-steel-50 transition-colors ${
+                                                            selectedMechanic?.id === mechanic.id ? 'bg-brand-50 text-brand-700' : ''
+                                                        }`}
+                                                    >
+                                                        <div className='font-medium'>{mechanic.name}</div>
+                                                        <div className='text-sm text-steel-500'>{mechanic.email}</div>
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div className='px-4 py-3 text-steel-500 text-sm'>
+                                                    {mechanicSearch ? 'No mechanics found' : 'Start typing to search...'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                <button onClick={handleAssignMechanic} disabled={!selectedMechanic} className='btn-sm btn-primary'>
                                     Assign
                                 </button>
-                                <button onClick={() => setShowAddMechanic(false)} className='btn-sm btn-secondary'>
+                                <button onClick={() => { setShowAddMechanic(false); setMechanicSearch(''); setSelectedMechanic(null); }} className='btn-sm btn-secondary'>
                                     <X className='w-4 h-4' />
                                 </button>
                             </div>

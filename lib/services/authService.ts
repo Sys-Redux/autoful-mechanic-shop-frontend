@@ -4,7 +4,7 @@ import {
     signOut,
     type User as FirebaseUser,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, secondaryAuth } from '@/lib/firebase';
 import { api } from '@/lib/api';
 import type {
     AuthUser,
@@ -67,6 +67,30 @@ export const registerCustomer = async (data: RegisterCustomerData): Promise<Auth
         loginResponse.auth_token,
         data.name
     );
+};
+
+// Create customer account without affecting current session (for mechanics creating customers)
+export const createCustomerAccount = async (data: RegisterCustomerData): Promise<CreateUserResponse> => {
+    // Use secondary auth to create user without signing out current user
+    const userCredential = await createUserWithEmailAndPassword(
+        secondaryAuth,
+        data.email,
+        data.password
+    );
+
+    // Sign out from secondary auth immediately
+    await signOut(secondaryAuth);
+
+    // Create user in backend
+    const backendResponse = await api.post<CreateUserResponse>('/customers', {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+        firebase_uid: userCredential.user.uid,
+    });
+
+    return backendResponse;
 };
 
 export const registerMechanic = async (data: RegisterMechanicData): Promise<AuthUser> => {
