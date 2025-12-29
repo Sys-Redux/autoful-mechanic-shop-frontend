@@ -27,6 +27,18 @@ import { useMechanics } from '@/hooks/useMechanics';
 import { useInventory } from '@/hooks/useInventory';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import { Mechanic } from '@/types';
+import { Skeleton } from '@/components/ui/Skeleton';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogDescription,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function TicketDetailPage() {
     const params = useParams();
@@ -84,7 +96,6 @@ export default function TicketDetailPage() {
     }, []);
 
     const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) return;
         try {
             await deleteTicket.mutateAsync(ticketId);
             toast.success('Service ticket deleted successfully');
@@ -158,11 +169,11 @@ export default function TicketDetailPage() {
     if (isLoading) {
         return (
             <div className='space-y-6'>
-                <div className='h-8 w-48 bg-steel-200 rounded animate-pulse' />
+                <Skeleton className='h-8 w-48' />
                 <div className='bg-white rounded-xl border border-steel-200 p-6 space-y-4'>
-                    <div className='h-6 w-1/3 bg-steel-200 rounded animate-pulse' />
-                    <div className='h-4 w-1/2 bg-steel-100 rounded animate-pulse' />
-                    <div className='h-4 w-2/3 bg-steel-100 rounded animate-pulse' />
+                    <Skeleton className='h-6 w-1/3' />
+                    <Skeleton className='h-4 w-1/2 bg-steel-100' />
+                    <Skeleton className='h-4 w-2/3 bg-steel-100' />
                 </div>
             </div>
         );
@@ -197,10 +208,31 @@ export default function TicketDetailPage() {
                         <p className='text-steel-600'>{ticket.service_desc}</p>
                     </div>
                 </div>
-                <button onClick={handleDelete} className='btn-danger'>
-                    <Trash2 className='w-5 h-5' />
-                    Delete Ticket
-                </button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <button className='btn-danger'>
+                            <Trash2 className='w-5 h-5' />
+                            Delete Ticket
+                        </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Service Ticket</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete this ticket? This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleDelete}
+                                className='bg-red-600 hover:bg-red-700'
+                            >
+                                Delete Ticket
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
             {/* Ticket Details */}
             <div className='grid md:grid-cols-2 gap-6'>

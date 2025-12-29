@@ -5,6 +5,8 @@ import { useMyTickets } from '@/hooks/useCustomers';
 import { useAppSelector } from '@/lib/store/hooks';
 import { selectUser } from '@/lib/store/authSlice';
 import { formatDate } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { TicketListSkeleton } from '@/components/ui/TicketSkeleton';
 
 export default function CustomerDashboardPage() {
     const user = useAppSelector(selectUser);
@@ -38,7 +40,7 @@ export default function CustomerDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Total Tickets</p>
                             {isLoading ? (
-                                <div className='h-8 w-16 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-8 w-16 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{totalTickets}</p>
                             )}
@@ -54,7 +56,7 @@ export default function CustomerDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Last Service Date</p>
                             {isLoading ? (
-                                <div className='h-8 w-24 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-8 w-16 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>
                                     {lastServiceDate ? formatDate(lastServiceDate) : 'N/A'}
@@ -72,7 +74,7 @@ export default function CustomerDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Vehicles Serviced</p>
                             {isLoading ? (
-                                <div className='h-8 w-12 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-8 w-16 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{uniqueVehicles}</p>
                             )}
@@ -93,17 +95,7 @@ export default function CustomerDashboardPage() {
                     </Link>
                 </div>
                 {isLoading ? (
-                    <div className='p-6 space-y-4'>
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className='flex gap-4 animate-pulse'>
-                                <div className='w-10 h-10 bg-steel-200 rounded-lg' />
-                                <div className='flex-1 space-y-2'>
-                                    <div className='h-4 bg-steel-200 rounded w-1/3' />
-                                    <div className='h-3 bg-steel-100 rounded w-2/3' />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <TicketListSkeleton count={3} variant='row' />
                 ) : error ? (
                     <div className='p-6 text-center'>
                         <p className='text-red-500'>Failed to load tickets</p>

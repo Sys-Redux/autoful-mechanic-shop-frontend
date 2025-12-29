@@ -12,6 +12,8 @@ import { useServiceTickets } from '@/hooks/useServiceTickets';
 import { useInventory, useLowStockInventory } from '@/hooks/useInventory';
 import { useCustomers } from '@/hooks/useCustomers';
 import { formatDate, formatCurrency } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/Skeleton';
+import { TicketListSkeleton } from '@/components/ui/TicketSkeleton';
 
 export default function MechanicDashboardPage() {
     const { data: tickets, isLoading: ticketsLoading } = useServiceTickets(1, 5);
@@ -52,7 +54,7 @@ export default function MechanicDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Tickets</p>
                             {ticketsLoading ? (
-                                <div className='h-7 w-12 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-7 w-12 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{totalTickets}</p>
                             )}
@@ -71,7 +73,7 @@ export default function MechanicDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Inventory</p>
                             {inventoryLoading ? (
-                                <div className='h-7 w-12 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-7 w-12 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{totalParts}</p>
                             )}
@@ -100,7 +102,7 @@ export default function MechanicDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Low Stock</p>
                             {lowStockLoading ? (
-                                <div className='h-7 w-12 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-7 w-12 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{lowStockCount}</p>
                             )}
@@ -119,7 +121,7 @@ export default function MechanicDashboardPage() {
                         <div>
                             <p className='text-sm text-steel-500'>Customers</p>
                             {customersLoading ? (
-                                <div className='h-7 w-12 bg-steel-200 rounded animate-pulse mt-1' />
+                                <Skeleton className='h-7 w-12 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{totalCustomers}</p>
                             )}
@@ -142,17 +144,7 @@ export default function MechanicDashboardPage() {
                         </Link>
                     </div>
                     {ticketsLoading ? (
-                        <div className='p-6 space-y-4'>
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className='flex gap-3 animate-pulse'>
-                                    <div className='w-10 h-10 bg-steel-200 rounded-lg' />
-                                    <div className='flex-1 space-y-2'>
-                                        <div className='h-4 bg-steel-200 rounded w-2/3' />
-                                        <div className='h-3 bg-steel-100 rounded w-1/2' />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <TicketListSkeleton count={3} />
                     ) : tickets && tickets.length > 0 ? (
                         <div className='divide-y divide-steel-100'>
                             {tickets.slice(0, 5).map((ticket) => (
@@ -192,17 +184,7 @@ export default function MechanicDashboardPage() {
                         </Link>
                     </div>
                     {lowStockLoading ? (
-                        <div className='p-6 space-y-4'>
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className='flex gap-3 animate-pulse'>
-                                    <div className='w-10 h-10 bg-steel-200 rounded-lg' />
-                                    <div className='flex-1 space-y-2'>
-                                        <div className='h-4 bg-steel-200 rounded w-2/3' />
-                                        <div className='h-3 bg-steel-100 rounded w-1/2' />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <TicketListSkeleton count={3} />
                     ) : lowStock && lowStock.parts.length > 0 ? (
                         <div className='divide-y divide-steel-100'>
                             {lowStock.parts.slice(0, 5).map((part) => (

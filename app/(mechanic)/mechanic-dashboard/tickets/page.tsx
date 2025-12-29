@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Search, PlusCircle, Ticket, ChevronRight } from "lucide-react";
 import { useServiceTickets } from '@/hooks/useServiceTickets';
 import { formatDate } from '@/lib/utils';
+import { TicketListSkeleton } from '@/components/ui/TicketSkeleton';
 
 export default function TicketsPage() {
     const [page, setPage] = useState(1);
@@ -43,16 +44,8 @@ export default function TicketsPage() {
             {/* Tickets List */}
             <div className='bg-white rounded-xl border border-steel-200 overflow-hidden'>
                 {isLoading ? (
-                    <div className='p-6 space-y-4'>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className='flex gap-4 animate-pulse'>
-                                <div className='w-12 h-12 bg-steel-200 rounded-lg' />
-                                <div className='flex-1 space-y-2'>
-                                    <div className='h-4 bg-steel-200 rounded w-1/3' />
-                                    <div className='h-4 bg-steel-100 rounded w-1/2' />
-                                </div>
-                            </div>
-                        ))}
+                    <div className='p-6'>
+                        <TicketListSkeleton count={5} variant='row' />
                     </div>
                 ) : filteredTickets.length > 0 ? (
                     <div className='divide-y divide-steel-100'>

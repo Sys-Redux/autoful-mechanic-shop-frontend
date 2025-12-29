@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useCustomers, useCreateCustomer } from '@/hooks/useCustomers';
 import CustomerRow from '@/components/customers/CustomerRow';
 import { registerCustomerSchema, type RegisterCustomerFormData } from '@/lib/validations/auth';
+import { SkeletonBox, SkeletonText } from '@/components/ui/Skeleton';
 
 export default function CustomersPage() {
     const [search, setSearch] = useState('');
@@ -213,11 +214,11 @@ export default function CustomersPage() {
                 {isLoading ? (
                     <div className='p-6 space-y-4'>
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className='flex gap-4 animate-pulse'>
-                                <div className='w-12 h-12 bg-steel-200 rounded-full' />
+                            <div key={i} className='flex gap-4'>
+                                <SkeletonBox className='rounded-full' />
                                 <div className='flex-1 space-y-2'>
-                                    <div className='h-4 bg-steel-200 rounded w-1/3' />
-                                    <div className='h-4 bg-steel-100 rounded w-1/2' />
+                                    <SkeletonText className='w-1/3' />
+                                    <SkeletonText className='w-1/2 bg-steel-100' />
                                 </div>
                             </div>
                         ))}

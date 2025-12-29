@@ -4,55 +4,28 @@ interface SkeletonProps {
     className?: string;
 }
 
-// Base skeleton w/ pulse animation
+// Base skeleton - just a pulsing div
 export function Skeleton({ className }: SkeletonProps) {
-    return (
-        <div
-            className={cn('animate-pulse bg-steel-200 rounded', className)}
-            aria-hidden="true"
-        />
-    );
+  return (
+    <div
+      className={cn(
+        'animate-pulse rounded bg-steel-200',
+        className
+      )}
+    />
+  );
 }
 
-// Text line skeleton
-export function SkeletonText({ className, lines = 1 }: SkeletonProps & { lines?: number }) {
-    return (
-        <div className='space-y-2'>
-            {Array.from({ length: lines }).map((_, i) => (
-                <Skeleton
-                    key={i}
-                    className={cn(
-                        'h-4 rounded',
-                        i === lines - 1 && lines > 1 ? 'w-3/4' : 'w-full',
-                        className
-                    )}
-                />
-            ))}
-        </div>
-    );
+// Text line placeholder - for simulating text content
+export function SkeletonText({ className }: SkeletonProps) {
+  return (
+    <Skeleton className={cn('h-4 w-full', className)} />
+  );
 }
 
-// Circle placeholder - for avatars/icons
-export function SkeletonCircle({ className, size = 'md' }: SkeletonProps & { size?: 'sm' | 'md' | 'lg' }) {
-    const sizeClasses = {
-        sm: 'w-8 h-8',
-        md: 'w-12 h-12',
-        lg: 'w-16 h-16',
-    };
-    return <Skeleton className={cn('rounded-full', sizeClasses[size], className)} />;
-}
-
-// Card placeholder
-export function SkeletonCard({ className }: SkeletonProps) {
-    return (
-        <div className={cn('bg-white rounded-xl border border-steel-200 p-6', className)}>
-            <div className='flex gap-4'>
-                <SkeletonCircle />
-                <div className='flex-1 space-y-2'>
-                    <Skeleton className='h-5 w-1/3' />
-                    <Skeleton className='h-4 w-1/2' />
-                </div>
-            </div>
-        </div>
-    );
+// Box placeholder - for icon containers, images
+export function SkeletonBox({ className }: SkeletonProps) {
+  return (
+    <Skeleton className={cn('h-12 w-12 rounded-lg', className)} />
+  );
 }

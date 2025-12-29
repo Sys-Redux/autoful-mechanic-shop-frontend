@@ -23,6 +23,18 @@ import {
     useUpdatePart,
     useDeletePart,
 } from '@/hooks/useInventory';
+import { Skeleton } from '@/components/ui/Skeleton';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogDescription,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const partSchema = z.object({
     part_name: z.string().min(2, 'Part name must be at least 2 characters long'),
@@ -93,8 +105,7 @@ export default function InventoryPage() {
         }
     };
 
-    const handleDelete = async (id: number, partName: string) => {
-        if (!confirm(`Delete "${partName}"? This cannot be undone.`)) return;
+    const handleDelete = async (id: number) => {
         try {
             await deletePart.mutateAsync(id);
             toast.success('Part deleted successfully');
@@ -203,7 +214,7 @@ export default function InventoryPage() {
                 {isLoading ? (
                     <div className='p-6 space-y-4'>
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className='h-12 bg-steel-100 rounded animate-pulse' />
+                            <Skeleton key={i} className='h-12 bg-steel-100' />
                         ))}
                     </div>
                 ) : filteredParts.length > 0 ? (
@@ -282,13 +293,34 @@ export default function InventoryPage() {
                                                         >
                                                             <Edit2 className='w-4 h-4' />
                                                         </button>
-                                                        <button
-                                                            onClick={() => handleDelete(part.id, part.part_name)}
-                                                            className='p-2 text-steel-400 hover:text-red-500
-                                                                hover:bg-red-50 rounded-lg transition-colors'
-                                                        >
-                                                            <Trash2 className='w-4 h-4' />
-                                                        </button>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <button
+                                                                    className='p-2 text-steel-400 hover:text-red-500
+                                                                        hover:bg-red-50 rounded-lg transition-colors'
+                                                                >
+                                                                    <Trash2 className='w-4 h-4' />
+                                                                </button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Part</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to delete &quot;{part.part_name}&quot;?
+                                                                        This action cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleDelete(part.id)}
+                                                                        className='bg-red-600 hover:bg-red-700'
+                                                                    >
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
                                                     </div>
                                                 </td>
                                             </>

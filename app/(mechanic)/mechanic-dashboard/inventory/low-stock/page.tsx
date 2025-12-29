@@ -5,6 +5,7 @@ import { ArrowLeft, AlertTriangle, Package, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLowStockInventory, useUpdatePart } from '@/hooks/useInventory';
 import { formatCurrency } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function LowStockPage() {
     const [threshold, setThreshold] = useState(10);
@@ -78,7 +79,7 @@ export default function LowStockPage() {
                 {isLoading ? (
                     <div className='p-6 space-y-4'>
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className='h-16 bg-steel-100 rounded animate-pulse' />
+                            <Skeleton key={i} className='h-16 bg-steel-100' />
                         ))}
                     </div>
                 ) : lowStock && lowStock.parts.length > 0 ? (

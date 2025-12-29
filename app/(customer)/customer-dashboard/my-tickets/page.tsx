@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Car, Calendar, FileText, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { useMyTickets } from '@/hooks/useCustomers';
 import { formatDate } from '@/lib/utils';
+import { TicketListSkeleton } from '@/components/ui/TicketSkeleton';
 
 export default function MyTicketsPage() {
     const { data: tickets, isLoading, error } = useMyTickets();
@@ -44,22 +45,7 @@ export default function MyTicketsPage() {
             </div>
             {/* Tickets List */}
             {isLoading ? (
-                <div className='space-y-4'>
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div
-                            key={i}
-                            className='bg-white rounded-xl border border-steel-200 p-6 animate-pulse'
-                        >
-                            <div className='flex gap-4'>
-                                <div className='w-12 h-12 bg-steel-200 rounded-lg' />
-                                <div className='flex-1 space-y-2'>
-                                    <div className='h-5 bg-steel-200 rounded w-1/2' />
-                                    <div className='h-4 bg-steel-100 rounded w-1/3' />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <TicketListSkeleton count={5} variant='card' />
             ) : error ? (
                 <div className='bg-red-50 border border-red-200 rounded-xl p-6 text-center'>
                     <p className='text-red-600'>Failed to load tickets. Please try again later.</p>

@@ -4,11 +4,22 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Mail, Phone, Save, Trash2, Loader2, AlertTriangle } from "lucide-react";
+import { User, Mail, Phone, Save, Trash2, Loader2, } from "lucide-react";
 import { toast } from 'sonner';
 import { useAppSelector, useAppDispatch } from '@/lib/store/hooks';
 import { selectUser, updateProfile, logout } from '@/lib/store/authSlice';
 import { useDeleteCustomer } from '@/hooks/useCustomers';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const profileSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,7 +37,6 @@ export default function ProfilePage() {
     const user = useAppSelector(selectUser);
     const deleteCustomer = useDeleteCustomer();
 
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
 
     const {
@@ -157,53 +167,44 @@ export default function ProfilePage() {
                 <p className='text-steel-600 text-sm mb-4'>
                     Once you delete your account, there is no going back. All your data will be permanently removed.
                 </p>
-                <button
-                    onClick={() => setShowDeleteModal(true)}
-                    className='flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 font-medium
-                        rounded-lg hover:bg-red-50 transition-colors'
-                >
-                    <Trash2 className='w-5 h-5' />
-                    Delete Account
-                </button>
-            </div>
-            {/* Delete Confirmation Modal */}
-            {showDeleteModal && (
-                <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50'>
-                    <div className='bg-white rounded-xl max-w-md w-full p-6 space-y-4'>
-                        <div className='flex items-center gap-3 text-red-600'>
-                            <AlertTriangle className='w-6 h-6' />
-                            <h3 className='text-lg font-semibold'>Confirm Delete</h3>
-                        </div>
-                        <p className='text-steel-600'>
-                            Are you sure you want to delete your account? This action cannot be undone.
-                        </p>
-                        <div className='flex gap-3 justify-end'>
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                className='px-4 py-2 rounded-lg border border-steel-300 text-steel-600
-                                    hover:bg-steel-100 transition-colors'
-                            >
-                                Cancel
-                            </button>
-                            <button
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <button
+                            className='flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 font-medium
+                                rounded-lg hover:bg-red-50 transition-colors'
+                        >
+                            <Trash2 className='w-5 h-5' />
+                            Delete Account
+                        </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Are you sure you want to delete your account? This action cannot be undone.
+                                All your data will be permanently removed.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
                                 onClick={handleDeleteAccount}
                                 disabled={deleteCustomer.isPending}
-                                className='flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-medium
-                                    rounded-lg hover:bg-red-700 disabled:bg-red-300 transition-colors'
+                                className='bg-red-600 hover:bg-red-700 disabled:bg-red-300'
                             >
                                 {deleteCustomer.isPending ? (
                                     <>
-                                        <Loader2 className='w-4 h-4 animate-spin' />
+                                        <Loader2 className='w-4 h-4 animate-spin mr-2' />
                                         Deleting...
                                     </>
                                 ) : (
                                     'Delete Account'
                                 )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </div>
         </div>
     );
 }
