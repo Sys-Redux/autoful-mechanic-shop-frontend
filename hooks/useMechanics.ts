@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { Mechanic, MechanicWithTickets } from '@/types/index';
+import type { Mechanic, MechanicWithTickets, TopMechanic } from '@/types/index';
 import { useAppSelector } from '@/lib/store/hooks';
 import { selectUserDbId, selectIsMechanic } from '@/lib/store/authSlice';
 
@@ -38,7 +38,7 @@ export function useMechanic(id: number) {
 export function useTopMechanics() {
     return useQuery({
         queryKey: mechanicKeys.top(),
-        queryFn: () => api.get<Mechanic[]>('/mechanics/top'),
+        queryFn: () => api.get<TopMechanic[]>('/mechanics/top'),
     });
 }
 

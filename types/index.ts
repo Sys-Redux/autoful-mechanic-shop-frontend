@@ -23,6 +23,14 @@ export interface MechanicWithTickets extends Mechanic {
     service_tickets: ServiceTicketBasic[];
 }
 
+export interface TopMechanic {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    ticket_count: number;
+}
+
 // =========== SERVICE TICKET ===========
 export interface ServiceTicketBasic {
     id: number;
