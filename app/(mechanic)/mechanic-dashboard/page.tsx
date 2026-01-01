@@ -11,17 +11,27 @@ import {
 import { useServiceTickets } from '@/hooks/useServiceTickets';
 import { useInventory, useLowStockInventory } from '@/hooks/useInventory';
 import { useCustomers } from '@/hooks/useCustomers';
+import { useTopMechanics } from '@/hooks/useMechanics';
 import { formatDate, formatCurrency } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/Skeleton';
 import { TicketListSkeleton } from '@/components/ui/TicketSkeleton';
+import { ChartCard } from '@/components/charts/ChartCard';
+import { TicketsByDateChart } from '@/components/charts/TicketsByDateChart';
+import { TicketsByWeekdayChart } from '@/components/charts/TicketsByWeekdayChart';
+import { InventoryValueChart } from '@/components/charts/InventoryValueChart';
+import { TopMechanicsChart } from '@/components/charts/TopMechanicsChart';
 
 export default function MechanicDashboardPage() {
-    const { data: tickets, isLoading: ticketsLoading } = useServiceTickets(1, 5);
+    // Fetch 5 recent tickets for the list
+    const { data: recentTickets, isLoading: recentTicketsLoading } = useServiceTickets(1, 5);
+    // Fetch more tickets for meaningful chart data
+    const { data: allTickets, isLoading: allTicketsLoading } = useServiceTickets(1, 100);
     const { data: inventory, isLoading: inventoryLoading } = useInventory();
     const { data: lowStock, isLoading: lowStockLoading } = useLowStockInventory(10);
     const { data: customers, isLoading: customersLoading } = useCustomers();
+    const { data: topMechanics, isLoading: topMechanicsLoading } = useTopMechanics();
 
-    const totalTickets = tickets?.length || 0;
+    const totalTickets = allTickets?.length || 0;
     const totalParts = inventory?.length || 0;
     const lowStockCount = lowStock?.parts?.length || 0;
     const totalCustomers = customers?.length || 0;
@@ -53,7 +63,7 @@ export default function MechanicDashboardPage() {
                         </div>
                         <div>
                             <p className='text-sm text-steel-500'>Tickets</p>
-                            {ticketsLoading ? (
+                            {allTicketsLoading ? (
                                 <Skeleton className='h-7 w-12 mt-1' />
                             ) : (
                                 <p className='text-2xl font-bold text-steel-900'>{totalTickets}</p>
@@ -129,6 +139,66 @@ export default function MechanicDashboardPage() {
                     </div>
                 </Link>
             </div>
+
+            {/* Charts Section */}
+            <div className='grid lg:grid-cols-2 gap-6'>
+                {/* Tickets by Date */}
+                <ChartCard
+                    title='Tickets by Date'
+                    subtitle='Service tickets over the last 30 days'
+                >
+                    {allTicketsLoading ? (
+                        <div className='flex items-center justify-center h-full'>
+                            <Skeleton className='h-48 w-full' />
+                        </div>
+                    ) : (
+                        <TicketsByDateChart tickets={allTickets || []} days={30} />
+                    )}
+                </ChartCard>
+
+                {/* Tickets by Weekday */}
+                <ChartCard
+                    title='Tickets by Day of Week'
+                    subtitle='Which days are busiest'
+                >
+                    {allTicketsLoading ? (
+                        <div className='flex items-center justify-center h-full'>
+                            <Skeleton className='h-48 w-full' />
+                        </div>
+                    ) : (
+                        <TicketsByWeekdayChart tickets={allTickets || []} />
+                    )}
+                </ChartCard>
+
+                {/* Top Mechanics */}
+                <ChartCard
+                    title='Top Mechanics'
+                    subtitle='By completed tickets'
+                >
+                    {topMechanicsLoading ? (
+                        <div className='flex items-center justify-center h-full'>
+                            <Skeleton className='h-48 w-full' />
+                        </div>
+                    ) : (
+                        <TopMechanicsChart mechanics={topMechanics || []} />
+                    )}
+                </ChartCard>
+
+                {/* Inventory Value */}
+                <ChartCard
+                    title='Inventory Value'
+                    subtitle='Distribution by price range'
+                >
+                    {inventoryLoading ? (
+                        <div className='flex items-center justify-center h-full'>
+                            <Skeleton className='h-48 w-full' />
+                        </div>
+                    ) : (
+                        <InventoryValueChart parts={inventory || []} />
+                    )}
+                </ChartCard>
+            </div>
+
             {/* Recent Activity & Low Stock */}
             <div className='grid lg:grid-cols-2 gap-6'>
                 {/* Recent Tickets */}
@@ -143,11 +213,11 @@ export default function MechanicDashboardPage() {
                             <ArrowRight className='w-4 h-4' />
                         </Link>
                     </div>
-                    {ticketsLoading ? (
+                    {recentTicketsLoading ? (
                         <TicketListSkeleton count={3} />
-                    ) : tickets && tickets.length > 0 ? (
+                    ) : recentTickets && recentTickets.length > 0 ? (
                         <div className='divide-y divide-steel-100'>
-                            {tickets.slice(0, 5).map((ticket) => (
+                            {recentTickets.slice(0, 5).map((ticket) => (
                                 <Link
                                     key={ticket.id}
                                     href={`/mechanic-dashboard/tickets/${ticket.id}`}
